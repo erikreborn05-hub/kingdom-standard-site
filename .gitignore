@@ -1,0 +1,6 @@
+.DS_Store
+.claude/
+
+# Notes for the separate client-portal project, not part of this site
+PORTAL_BUILD_PROMPT.md
+PORTAL_SETUP_WALKTHROUGH.md
