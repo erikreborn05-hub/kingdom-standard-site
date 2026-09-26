@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://fast.wistia.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="../styles.css?v=20260925" />
+<link rel="stylesheet" href="../styles.css?v=20260926" />
 </head>
 <body>
 <div class="bg-grid"></div>
@@ -56,39 +56,8 @@
 </section>
 
 <section class="apply-section" id="apply">
-  <div id="applyButtonWrap" style="text-align: center;">
-    <button type="button" id="startApply" class="btn-next">Click here to apply</button>
-  </div>
-  <div class="form-card" id="applyForm" hidden>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-
-    <!-- Step 1: Role -->
-    <div class="form-step active" data-step="1">
-      <div class="step-num">Question 1 of 2</div>
-      <label class="question">What is your main role?</label>
-      <div class="option-list" data-field="role">
-        <button type="button" class="option"><span class="option-letter">A</span>Christian Hip-Hop Artist</button>
-        <button type="button" class="option"><span class="option-letter">B</span>Worship/Gospel Artist</button>
-        <button type="button" class="option"><span class="option-letter">C</span>Christian Producer</button>
-        <button type="button" class="option" data-other="true"><span class="option-letter">D</span>Other</button>
-      </div>
-      <input type="text" class="other-input" id="roleOther" placeholder="Tell us what you do" />
-      <div class="step-nav">
-        <span></span>
-        <button type="button" class="btn-next" data-next>Continue</button>
-      </div>
-    </div>
-
-    <!-- Step 2: 12 month goal -->
-    <div class="form-step" data-step="2">
-      <div class="step-num">Question 2 of 2</div>
-      <label class="question" for="goal12mo">Where do you want your music to be 12 months from now?</label>
-      <textarea id="goal12mo" name="goal12mo" rows="3"></textarea>
-      <div class="step-nav">
-        <button type="button" class="btn-back" data-back>Back</button>
-        <button type="button" class="btn-next" data-next>Continue</button>
-      </div>
-    </div>
+  <div style="text-align: center;">
+    <a href="apply/" class="btn-next">Click here to apply</a>
   </div>
 </section>
 
@@ -137,6 +106,5 @@
   <p class="copyright">© 2026 Kingdom Standard. All rights reserved.</p>
 </footer>
 <script src="../testimonials.js?v=20260925"></script>
-<script src="questions.js?v=20260925"></script>
 </body>
 </html>
