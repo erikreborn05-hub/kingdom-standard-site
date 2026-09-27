@@ -21,21 +21,37 @@
   closeBtn.textContent = "×";
   document.body.appendChild(closeBtn);
 
+  let opener = null;
+
   function open(img) {
+    opener = img;
     overlayImg.src = img.currentSrc || img.src;
     overlayImg.alt = img.alt || "";
     overlay.hidden = false;
     closeBtn.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+    closeBtn.focus();
   }
 
   function close() {
+    if (overlay.hidden) return;
     overlay.hidden = true;
     closeBtn.hidden = true;
     overlayImg.src = "";
+    document.documentElement.style.overflow = "";
+    if (opener) opener.focus();
   }
 
   images.forEach((img) => {
+    img.tabIndex = 0;
+    img.setAttribute("role", "button");
     img.addEventListener("click", () => open(img));
+    img.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(img);
+      }
+    });
   });
 
   overlay.addEventListener("click", close);
