@@ -473,12 +473,6 @@ h1 .accent {
   }
 }
 
-@media (max-width: 560px) {
-  .testimonials-grid {
-    columns: 1;
-  }
-}
-
 .testimonial-card {
   break-inside: avoid;
   margin-bottom: 16px;
@@ -513,6 +507,22 @@ h1 .accent {
 .testimonial-card img:focus-visible {
   outline: 2px solid var(--gold-bright);
   outline-offset: -2px;
+}
+
+/* Phones keep a two-column grid of small cards; tapping one opens it full size. */
+@media (max-width: 560px) {
+  .testimonials-grid {
+    column-gap: 10px;
+  }
+
+  .testimonial-card {
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+
+  .testimonial-card img {
+    max-height: 150px;
+  }
 }
 
 .lightbox {
