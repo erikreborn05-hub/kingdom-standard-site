@@ -1,16 +1,12 @@
-// Two-question qualifier embedded directly on /dominique/. Starts hidden
-// behind a "Click here to apply" button; clicking it swaps the button out
-// for the form in place. On completion, the two answers are sent to a
-// Google Sheet via an Apps Script webhook (see APPS_SCRIPT_SNIPPET.md for
-// the doPost() this pairs with), then the visitor is sent on to the booking
-// page. Logic mirrors the site's old multi-step form (same auto-advance/
-// validation patterns), trimmed to two steps.
+// Ten-question qualifier on /dominique/. Starts hidden behind the "Click here
+// to apply" button; on completion the answers go to Dominique's Google Sheet
+// via an Apps Script webhook, then the visitor continues to the booking page.
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbzltdMI7KSf1brRfpwcLV49FtR0rTbz5OSBwzYc482CUsAhRUulIwWp17kHjNu01jhm/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 
-const TOTAL_QUESTIONS = 2;
+const TOTAL_QUESTIONS = 10;
 const form = document.getElementById("applyForm");
 const steps = Array.from(form.querySelectorAll(".form-step"));
 const progressFill = document.getElementById("progressFill");
@@ -38,8 +34,16 @@ function showStep(index) {
   const pct = Math.min((stepNum / TOTAL_QUESTIONS) * 100, 100);
   progressFill.style.width = `${pct}%`;
 
-  const firstField = step.querySelector("input:not([type=hidden]), textarea");
+  const firstField = step.querySelector("input:not(.other-input), textarea");
   if (firstField) firstField.focus({ preventScroll: true });
+}
+
+function textField(step) {
+  return step.querySelector("input[type='text']:not(.other-input), input[type='email'], input[type='tel'], textarea");
+}
+
+function isValidPhone(value) {
+  return value.replace(/\D/g, "").length >= 7;
 }
 
 function selectedOption(step) {
@@ -58,8 +62,12 @@ function validateStep(step) {
     }
     return true;
   }
-  const textarea = step.querySelector("textarea");
-  if (textarea) return !!textarea.value.trim();
+  const field = textField(step);
+  if (field) {
+    if (!field.value.trim()) return false;
+    if (field.type === "tel") return isValidPhone(field.value);
+    return field.checkValidity();
+  }
   return true;
 }
 
@@ -90,8 +98,11 @@ function recordAnswers(step) {
     }
     return;
   }
-  const textarea = step.querySelector("textarea");
-  if (textarea) answers[textarea.name || textarea.id] = textarea.value.trim();
+  const field = textField(step);
+  if (field) {
+    const phoneCode = step.querySelector(".phone-code");
+    answers[field.name || field.id] = phoneCode ? `${phoneCode.value} ${field.value.trim()}` : field.value.trim();
+  }
 }
 
 // Fire-and-forget, same pattern the old erikreborn form used: a webhook
@@ -121,7 +132,7 @@ function goNext() {
     const invalidEl =
       selected && selected.dataset.other === "true"
         ? step.querySelector(".other-input")
-        : step.querySelector("textarea");
+        : textField(step);
     flashInvalid(invalidEl);
     return;
   }

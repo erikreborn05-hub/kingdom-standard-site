@@ -743,6 +743,54 @@ h1 .accent {
   letter-spacing: -0.01em;
 }
 
+.form-step input[type="text"],
+.form-step input[type="email"],
+.form-step input[type="tel"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+  font-size: 1.15rem;
+  padding: 10px 2px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-step input:focus {
+  border-color: var(--gold);
+}
+
+.phone-field {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.phone-code {
+  flex: none;
+  width: 108px;
+  background: var(--card);
+  border: none;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+  font-size: 1.05rem;
+  padding: 10px 2px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.phone-code:focus {
+  border-color: var(--gold);
+}
+
+.phone-field input[type="tel"] {
+  flex: 1;
+  min-width: 0;
+}
+
 .form-step textarea {
   width: 100%;
   background: transparent;
