@@ -791,6 +791,27 @@ h1 .accent {
   min-width: 0;
 }
 
+.field-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 6px 0 -14px;
+}
+
+.end-note {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.form-end .btn-next {
+  align-self: flex-start;
+}
+
+.form-end .btn-next[hidden] {
+  display: none;
+}
+
 .form-step textarea {
   width: 100%;
   background: transparent;

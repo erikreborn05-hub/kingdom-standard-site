@@ -1,74 +1,84 @@
-// Ten-question qualifier on /dominique/. Starts hidden behind the "Click here
-// to apply" button; on completion the answers go to Dominique's Google Sheet
-// via an Apps Script webhook, then the visitor continues to the booking page.
+// Nine-question qualifier on /dominique/. Starts hidden behind the "Click here
+// to apply" button. Answers go to Dominique's Google Sheet via an Apps Script
+// webhook. "Not right now" on the investment question ends on a Kingdom Roots
+// invite instead of the booking page; Worship/Gospel artists finish on the
+// "application received" page; everyone else continues to apply/.
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbzltdMI7KSf1brRfpwcLV49FtR0rTbz5OSBwzYc482CUsAhRUulIwWp17kHjNu01jhm/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
+// Leave empty to hide the "Join Kingdom Roots" button on the end screen.
+const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 
-const TOTAL_QUESTIONS = 10;
+const TOTAL_QUESTIONS = 9;
+const NOT_READY = "Not right now";
+// Applicants in this role are reviewed manually instead of booking a call.
+const REVIEW_ROLE = "Worship/Gospel Artist";
+
 const form = document.getElementById("applyForm");
 const steps = Array.from(form.querySelectorAll(".form-step"));
+const questionSteps = steps.filter((s) => s.dataset.step !== "end");
+const endStep = steps.find((s) => s.dataset.step === "end");
 const progressFill = document.getElementById("progressFill");
 const startBtn = document.getElementById("startApply");
 const buttonWrap = document.getElementById("applyButtonWrap");
+const rootsLink = document.getElementById("rootsLink");
 
-if (startBtn) {
-  startBtn.addEventListener("click", () => {
-    buttonWrap.hidden = true;
-    form.hidden = false;
-    showStep(0); // re-focus the first field now that it's actually visible
-  });
+if (rootsLink && KINGDOM_ROOTS_URL) {
+  rootsLink.href = KINGDOM_ROOTS_URL;
+  rootsLink.hidden = false;
 }
+
+startBtn.addEventListener("click", () => {
+  buttonWrap.hidden = true;
+  form.hidden = false;
+  showStep(0);
+});
 
 const answers = {};
 let currentIndex = 0;
-let autoAdvanceTimer = null; // pending setTimeout(goNext) from an option click, if any
+let autoAdvanceTimer = null;
+let finished = false;
 
 function showStep(index) {
   steps.forEach((s, i) => s.classList.toggle("active", i === index));
   currentIndex = index;
-
   const step = steps[index];
-  const stepNum = parseInt(step.dataset.step, 10) || TOTAL_QUESTIONS;
-  const pct = Math.min((stepNum / TOTAL_QUESTIONS) * 100, 100);
-  progressFill.style.width = `${pct}%`;
-
-  const firstField = step.querySelector("input:not(.other-input), textarea");
-  if (firstField) firstField.focus({ preventScroll: true });
+  const num = step.dataset.step === "end" ? TOTAL_QUESTIONS : parseInt(step.dataset.step, 10);
+  progressFill.style.width = `${Math.min((num / TOTAL_QUESTIONS) * 100, 100)}%`;
+  const first = step.querySelector("input:not(.other-input), textarea");
+  if (first) first.focus({ preventScroll: true });
 }
 
-function textField(step) {
-  return step.querySelector("input[type='text']:not(.other-input), input[type='email'], input[type='tel'], textarea");
-}
-
-function isValidPhone(value) {
-  return value.replace(/\D/g, "").length >= 7;
+function textFields(step) {
+  return Array.from(step.querySelectorAll("input:not(.other-input), textarea"));
 }
 
 function selectedOption(step) {
-  const optionList = step.querySelector(".option-list");
-  return optionList ? optionList.querySelector(".option.selected") : null;
+  const list = step.querySelector(".option-list");
+  return list ? list.querySelector(".option.selected") : null;
 }
 
-function validateStep(step) {
-  const optionList = step.querySelector(".option-list");
-  if (optionList) {
+function optionLabel(optionEl) {
+  const clone = optionEl.cloneNode(true);
+  const letter = clone.querySelector(".option-letter");
+  if (letter) letter.remove();
+  return clone.textContent.trim();
+}
+
+// Returns the first invalid element, or null if the step is complete.
+function invalidField(step) {
+  const list = step.querySelector(".option-list");
+  if (list) {
     const selected = selectedOption(step);
-    if (!selected) return false;
+    if (!selected) return list;
     if (selected.dataset.other === "true") {
-      const otherInput = step.querySelector(".other-input");
-      return !!(otherInput && otherInput.value.trim());
+      const other = step.querySelector(".other-input");
+      if (!other.value.trim()) return other;
     }
-    return true;
+    return null;
   }
-  const field = textField(step);
-  if (field) {
-    if (!field.value.trim()) return false;
-    if (field.type === "tel") return isValidPhone(field.value);
-    return field.checkValidity();
-  }
-  return true;
+  return textFields(step).find((f) => !f.value.trim() || !f.checkValidity()) || null;
 }
 
 function flashInvalid(el) {
@@ -79,94 +89,88 @@ function flashInvalid(el) {
   }, 900);
 }
 
-function optionLabel(optionEl) {
-  const clone = optionEl.cloneNode(true);
-  const letter = clone.querySelector(".option-letter");
-  if (letter) letter.remove();
-  return clone.textContent.trim();
-}
-
 function recordAnswers(step) {
-  const optionList = step.querySelector(".option-list");
-  if (optionList) {
+  const list = step.querySelector(".option-list");
+  if (list) {
     const selected = selectedOption(step);
-    if (selected && selected.dataset.other === "true") {
-      const otherInput = step.querySelector(".other-input");
-      answers[optionList.dataset.field] = otherInput.value.trim();
-    } else if (selected) {
-      answers[optionList.dataset.field] = optionLabel(selected);
-    }
+    if (!selected) return;
+    answers[list.dataset.field] =
+      selected.dataset.other === "true"
+        ? `Other: ${step.querySelector(".other-input").value.trim()}`
+        : optionLabel(selected);
     return;
   }
-  const field = textField(step);
-  if (field) {
-    const phoneCode = step.querySelector(".phone-code");
-    answers[field.name || field.id] = phoneCode ? `${phoneCode.value} ${field.value.trim()}` : field.value.trim();
-  }
+  textFields(step).forEach((f) => {
+    answers[f.name || f.id] = f.value.trim();
+  });
 }
 
-// Fire-and-forget, same pattern the old erikreborn form used: a webhook
-// hiccup should never block someone from reaching the booking page.
-function sendAnswers() {
+// Fire-and-forget: a webhook hiccup should never block the visitor.
+function sendAnswers(outcome) {
   fetch(SHEET_WEBHOOK_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN }, answers)),
+    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, outcome }, answers)),
   }).catch(() => {});
 }
 
 function goNext() {
-  // See erikreborn/form.js history: an option click can have an auto-advance
-  // already queued, and a manual Continue click before it fires would run
-  // goNext() twice. Clearing here means whichever happens first wins.
   if (autoAdvanceTimer) {
     clearTimeout(autoAdvanceTimer);
     autoAdvanceTimer = null;
   }
+  if (finished) return;
 
   const step = steps[currentIndex];
-  if (!validateStep(step)) {
-    const optionList = step.querySelector(".option-list");
-    const selected = optionList ? selectedOption(step) : null;
-    const invalidEl =
-      selected && selected.dataset.other === "true"
-        ? step.querySelector(".other-input")
-        : textField(step);
-    flashInvalid(invalidEl);
+  const bad = invalidField(step);
+  if (bad) {
+    flashInvalid(bad);
+    return;
+  }
+  recordAnswers(step);
+
+  if (answers.investReady === NOT_READY && step.querySelector('[data-field="investReady"]')) {
+    finished = true;
+    sendAnswers("Kingdom Roots");
+    showStep(steps.indexOf(endStep));
     return;
   }
 
-  recordAnswers(step);
-
-  if (currentIndex < steps.length - 1) {
+  if (currentIndex < questionSteps.length - 1) {
     showStep(currentIndex + 1);
     return;
   }
 
-  // Both questions answered — record them, then on to the existing booking page.
-  sendAnswers();
+  finished = true;
+  if (answers.role === REVIEW_ROLE) {
+    sendAnswers("Under review");
+    window.location.href = "/application-received/";
+    return;
+  }
+  sendAnswers("Booking page");
   window.location.href = "apply/";
 }
 
 function goBack() {
-  if (currentIndex > 0) showStep(currentIndex - 1);
+  if (currentIndex > 0 && steps[currentIndex] !== endStep) showStep(currentIndex - 1);
 }
 
 form.querySelectorAll("[data-next]").forEach((btn) => btn.addEventListener("click", goNext));
 form.querySelectorAll("[data-back]").forEach((btn) => btn.addEventListener("click", goBack));
 
-// Enter key advances (Shift+Enter still inserts a newline in the textarea)
+// Enter advances; Shift+Enter still adds a newline in text areas.
 form.addEventListener("keydown", (e) => {
   if (e.key !== "Enter") return;
   const step = steps[currentIndex];
+  if (step === endStep) return;
   if (step.querySelector(".option-list") && !step.querySelector(".other-input.visible")) return;
   if (e.target.tagName === "TEXTAREA" && e.shiftKey) return;
   e.preventDefault();
   goNext();
 });
 
-// Step 1: single-select, auto-advance (except "Other", which reveals a text field)
+// Single-select options auto-advance, except "Other", which reveals a text box.
 form.querySelectorAll(".option-list").forEach((list) => {
   const step = list.closest(".form-step");
   const otherInput = step.querySelector(".other-input");
@@ -177,7 +181,6 @@ form.querySelectorAll(".option-list").forEach((list) => {
         clearTimeout(autoAdvanceTimer);
         autoAdvanceTimer = null;
       }
-
       list.querySelectorAll(".option").forEach((o) => o.classList.remove("selected"));
       opt.classList.add("selected");
       const isOther = opt.dataset.other === "true";
@@ -186,7 +189,7 @@ form.querySelectorAll(".option-list").forEach((list) => {
         otherInput.classList.toggle("visible", isOther);
         if (isOther) {
           otherInput.focus();
-          return; // wait for free-text entry + Continue
+          return;
         }
         otherInput.value = "";
       }
