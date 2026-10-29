@@ -1,4 +1,4 @@
-// Nine-question qualifier on /dominique/. Starts hidden behind the "Click here
+// Seven-question qualifier on /dominique/. Starts hidden behind the "Click here
 // to apply" button. Answers go to Dominique's Google Sheet via an Apps Script
 // webhook. "Not right now" on the investment question ends on a Kingdom Roots
 // invite instead of the booking page; Worship/Gospel artists finish on the
@@ -10,7 +10,7 @@ const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 // Leave empty to hide the "Join Kingdom Roots" button on the end screen.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 
-const TOTAL_QUESTIONS = 9;
+const TOTAL_QUESTIONS = 7;
 const NOT_READY = "Not right now";
 // Applicants in this role are reviewed manually instead of booking a call.
 const REVIEW_ROLE = "Worship/Gospel Artist";
@@ -153,6 +153,12 @@ function goNext() {
 }
 
 function goBack() {
+  // A pending auto-advance from an option click would otherwise fire after we
+  // move back and push the visitor forward again.
+  if (autoAdvanceTimer) {
+    clearTimeout(autoAdvanceTimer);
+    autoAdvanceTimer = null;
+  }
   if (currentIndex > 0 && steps[currentIndex] !== endStep) showStep(currentIndex - 1);
 }
 
@@ -200,6 +206,12 @@ form.querySelectorAll(".option-list").forEach((list) => {
       }, 220);
     });
   });
+});
+
+// Coming back from the booking page with the browser's Back button can restore
+// this page as it was left (mid-redirect), so let the form be used again.
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted && steps[currentIndex] !== endStep) finished = false;
 });
 
 showStep(0);
