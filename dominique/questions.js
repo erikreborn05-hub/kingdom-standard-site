@@ -1,4 +1,4 @@
-// Seven-question qualifier on /dominique/. Starts hidden behind the "Click here
+// Eight-question qualifier on /dominique/. Starts hidden behind the "Click here
 // to apply" button. Answers go to Dominique's Google Sheet via an Apps Script
 // webhook. "Not right now" on the investment question ends on a Kingdom Roots
 // invite instead of the booking page; Worship/Gospel artists finish on the
@@ -10,7 +10,7 @@ const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 // Leave empty to hide the "Join Kingdom Roots" button on the end screen.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 
-const TOTAL_QUESTIONS = 7;
+const TOTAL_QUESTIONS = 8;
 const NOT_READY = "Not right now";
 // Applicants in this role are reviewed manually instead of booking a call.
 const REVIEW_ROLE = "Worship/Gospel Artist";
@@ -78,7 +78,11 @@ function invalidField(step) {
     }
     return null;
   }
-  return textFields(step).find((f) => !f.value.trim() || !f.checkValidity()) || null;
+  return (
+    textFields(step).find(
+      (f) => !f.value.trim() || !f.checkValidity() || (f.type === "tel" && f.value.replace(/\D/g, "").length < 7)
+    ) || null
+  );
 }
 
 function flashInvalid(el) {
@@ -101,7 +105,8 @@ function recordAnswers(step) {
     return;
   }
   textFields(step).forEach((f) => {
-    answers[f.name || f.id] = f.value.trim();
+    const code = f.type === "tel" ? step.querySelector(".phone-code") : null;
+    answers[f.name || f.id] = code ? `${code.value} ${f.value.trim()}` : f.value.trim();
   });
 }
 
