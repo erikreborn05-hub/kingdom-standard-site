@@ -1,8 +1,8 @@
 // Eight-question qualifier on /dominique/. Starts hidden behind the "Click here
 // to apply" button. Answers go to Dominique's Google Sheet via an Apps Script
 // webhook. "Not right now" on the investment question ends on a Kingdom Roots
-// invite instead of the booking page; Worship/Gospel artists finish on the
-// "application received" page; everyone else continues to apply/.
+// invite instead of the booking page; Worship/Gospel artists, producers and
+// mixing engineers finish on the "application received" page; everyone else continues to apply/.
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwTuCWlMAFgMBSRru73gKhmkwZf_SfzMFrFrUa2cqy8XsDSOVlS9ulX1Nj7Aa8HuLDFDw/exec";
@@ -12,8 +12,8 @@ const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 
 const TOTAL_QUESTIONS = 8;
 const NOT_READY = "Not right now";
-// Applicants in this role are reviewed manually instead of booking a call.
-const REVIEW_ROLE = "Worship/Gospel Artist";
+// Applicants in these roles are reviewed manually instead of booking a call.
+const REVIEW_ROLES = ["Worship/Gospel Artist", "Producer / Beatmaker", "Mixing Engineer"];
 
 const form = document.getElementById("applyForm");
 const steps = Array.from(form.querySelectorAll(".form-step"));
@@ -148,7 +148,7 @@ function goNext() {
   }
 
   finished = true;
-  if (answers.role === REVIEW_ROLE) {
+  if (REVIEW_ROLES.includes(answers.role)) {
     sendAnswers("Under review");
     window.location.href = "/application-received/";
     return;
