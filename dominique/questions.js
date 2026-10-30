@@ -14,6 +14,8 @@ const TOTAL_QUESTIONS = 8;
 const NOT_READY = "Not right now";
 // Applicants in these roles are reviewed manually instead of booking a call.
 const REVIEW_ROLES = ["Worship/Gospel Artist", "Producer / Beatmaker", "Mixing Engineer"];
+// Kingdom Roots is for Christian artists only, so these roles never get the invite.
+const NON_ARTIST_ROLES = ["Producer / Beatmaker", "Mixing Engineer"];
 
 const form = document.getElementById("applyForm");
 const steps = Array.from(form.querySelectorAll(".form-step"));
@@ -137,6 +139,11 @@ function goNext() {
 
   if (answers.investReady === NOT_READY && step.querySelector('[data-field="investReady"]')) {
     finished = true;
+    if (NON_ARTIST_ROLES.includes(answers.role)) {
+      sendAnswers("Not ready to invest");
+      window.location.href = "/application-received/";
+      return;
+    }
     sendAnswers("Kingdom Roots");
     showStep(steps.indexOf(endStep));
     return;
