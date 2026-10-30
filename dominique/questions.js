@@ -5,7 +5,7 @@
 // "application received" page; everyone else continues to apply/.
 
 const SHEET_WEBHOOK_URL =
-  "https://script.google.com/macros/s/AKfycbwxkf4NQFVnEu3zZl6ngMFGZwBHNYcXbICKr-Hf3GlQ2rozQL5RbDThBxWxYXwND7b7sQ/exec";
+  "https://script.google.com/macros/s/AKfycbwTuCWlMAFgMBSRru73gKhmkwZf_SfzMFrFrUa2cqy8XsDSOVlS9ulX1Nj7Aa8HuLDFDw/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 // Leave empty to hide the "Join Kingdom Roots" button on the end screen.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
