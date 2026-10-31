@@ -1,8 +1,9 @@
 // Five-question qualifier on /dominique/, hidden behind the "Click here to apply"
 // button. Answers go to Dominique's Google Sheet via an Apps Script webhook, both
-// as the visitor goes and when they leave. Hip-Hop/R&B artists who answer "Yes"
-// or "No, but I'm planning to" book a call; producers, engineers and everyone
-// else end on the "application received" page.
+// as the visitor goes and when they leave. Producers and engineers always end on
+// the "application received" page; a plain "No" to the $200 question gets the
+// Kingdom Roots invite; Hip-Hop/R&B artists who answer "Yes" or "No, but I'm
+// planning to" book a call; anyone else ends on "application received".
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbw2u91V46TkZQ2507kpNiDOD3mi0XA-j2WN5ltwTAJtuBHXjij4bh-8Hswl7d1IuvmaRQ/exec";
@@ -16,6 +17,8 @@ const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
 // "application received" page, even alongside an artist role.
 const EXCLUDED_ROLES = ["Producer / Beatmaker", "Mixing Engineer"];
 const BOOKING_ANSWERS = ["Yes", "No, but I’m planning to"];
+// Plain "No" to the $200 question gets the free community invite instead.
+const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 let selectedRoles = [];
 
 const form = document.getElementById("applyForm");
@@ -25,6 +28,11 @@ const endStep = steps.find((s) => s.dataset.step === "end");
 const progressFill = document.getElementById("progressFill");
 const startBtn = document.getElementById("startApply");
 const buttonWrap = document.getElementById("applyButtonWrap");
+const rootsLink = document.getElementById("rootsLink");
+if (rootsLink) {
+  rootsLink.href = KINGDOM_ROOTS_URL;
+  rootsLink.hidden = false;
+}
 
 startBtn.addEventListener("click", () => {
   buttonWrap.hidden = true;
@@ -188,8 +196,15 @@ function goNext() {
   }
 
   finished = true;
+  const excluded = selectedRoles.some((r) => EXCLUDED_ROLES.includes(r));
+  // Kingdom Roots is for Christian artists only, so producers/engineers never get it.
+  if (answers.investReady === "No" && !excluded) {
+    sendAnswers("Kingdom Roots");
+    showStep(steps.indexOf(endStep));
+    return;
+  }
   const canBook =
-    !selectedRoles.some((r) => EXCLUDED_ROLES.includes(r)) &&
+    !excluded &&
     selectedRoles.some((r) => BOOKING_ROLES.includes(r)) &&
     BOOKING_ANSWERS.includes(answers.investReady);
   if (!canBook) {
