@@ -1,7 +1,8 @@
 // Five-question qualifier on /dominique/, hidden behind the "Click here to apply"
-// button. Answers go to Dominique's Google Sheet via an Apps Script webhook.
-// "Yes" to the $200 question books a call if they picked a Hip-Hop or R&B
-// artist role; every other path ends on the "application received" page.
+// button. Answers go to Dominique's Google Sheet via an Apps Script webhook, both
+// as the visitor goes and when they leave. Hip-Hop/R&B artists who answer "Yes"
+// or "No, but I'm planning to" book a call; producers, engineers and everyone
+// else end on the "application received" page.
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbw2u91V46TkZQ2507kpNiDOD3mi0XA-j2WN5ltwTAJtuBHXjij4bh-8Hswl7d1IuvmaRQ/exec";
@@ -11,6 +12,10 @@ const TOTAL_QUESTIONS = 5;
 // "Yes" books a call only if at least one of these roles is selected; anyone
 // else is reviewed by hand.
 const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
+// We don't work with producers or engineers: picking either always ends on the
+// "application received" page, even alongside an artist role.
+const EXCLUDED_ROLES = ["Producer / Beatmaker", "Mixing Engineer"];
+const BOOKING_ANSWERS = ["Yes", "No, but I’m planning to"];
 let selectedRoles = [];
 
 const form = document.getElementById("applyForm");
@@ -28,6 +33,11 @@ startBtn.addEventListener("click", () => {
 });
 
 const answers = {};
+// One ID per visit so the sheet updates a single row as answers come in,
+// instead of adding a new row for every step.
+const sessionId =
+  (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
+  `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 let currentIndex = 0;
 let autoAdvanceTimer = null;
 let finished = false;
@@ -96,6 +106,7 @@ function recordAnswers(step) {
   if (list) {
     const selected = selectedOption(step);
     if (!selected) return;
+    if (list.dataset.field === "role") selectedRoles = [optionLabel(selected)];
     answers[list.dataset.field] =
       selected.dataset.other === "true"
         ? `Other: ${step.querySelector(".other-input").value.trim()}`
@@ -113,10 +124,47 @@ function sendAnswers(outcome) {
   fetch(SHEET_WEBHOOK_URL, {
     method: "POST",
     mode: "no-cors",
+    keepalive: true,
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, outcome }, answers)),
+    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, outcome }, answers)),
   }).catch(() => {});
 }
+
+function progressOutcome() {
+  return `Stopped at question ${steps[currentIndex].dataset.step}`;
+}
+
+// Keep whatever is typed or picked on the current step even if it was never
+// submitted with Continue (used when the visitor leaves mid-form).
+function recordPartial(step) {
+  const list = step.querySelector(".option-list");
+  if (list) {
+    if (list.querySelector(".option.selected")) recordAnswers(step);
+    return;
+  }
+  textFields(step).forEach((f) => {
+    if (f.value.trim()) answers[f.name || f.id] = f.value.trim();
+  });
+  const phone = step.querySelector('input[type="tel"]');
+  const code = step.querySelector(".phone-code");
+  if (phone && code && phone.value.trim()) answers[phone.name || phone.id] = `${code.value} ${phone.value.trim()}`;
+}
+
+function hasAnswers() {
+  return Object.keys(answers).length > 0;
+}
+
+// Leaving the page (closing the tab, switching apps, going back) saves progress.
+function saveOnLeave() {
+  if (finished || form.hidden) return;
+  recordPartial(steps[currentIndex]);
+  if (hasAnswers()) sendAnswers(progressOutcome());
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") saveOnLeave();
+});
+window.addEventListener("pagehide", saveOnLeave);
 
 function goNext() {
   if (autoAdvanceTimer) {
@@ -135,11 +183,16 @@ function goNext() {
 
   if (currentIndex < questionSteps.length - 1) {
     showStep(currentIndex + 1);
+    sendAnswers(progressOutcome());
     return;
   }
 
   finished = true;
-  if (answers.investReady !== "Yes" || !selectedRoles.some((r) => BOOKING_ROLES.includes(r))) {
+  const canBook =
+    !selectedRoles.some((r) => EXCLUDED_ROLES.includes(r)) &&
+    selectedRoles.some((r) => BOOKING_ROLES.includes(r)) &&
+    BOOKING_ANSWERS.includes(answers.investReady);
+  if (!canBook) {
     sendAnswers("Under review");
     window.location.href = "/application-received/";
     return;
