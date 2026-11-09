@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="../styles.css?v=20261109c" />
+<link rel="stylesheet" href="../styles.css?v=20261109h" />
 </head>
 <body>
 <div class="bg-grid"></div>
@@ -37,9 +37,20 @@
   <img class="logo-mark" src="../assets/kingdom-standard-logo-cropped.png?v=20260928" width="400" height="261" alt="Kingdom Standard" />
 </header>
 
-<section class="confirmation-hero">
+<section class="confirmation-hero confirmation-hero--tight">
   <div class="wrap">
     <h1>Your Call Is <span class="accent-muted">Not Confirmed Yet.</span></h1>
+    <p class="step-label">Step 1: Add your call to your calendar</p>
+    <div class="add-cal" id="addCal" hidden>
+      <p class="add-cal-when" id="calWhen"></p>
+      <div class="add-cal-buttons">
+        <a class="add-cal-btn" id="calGoogle" href="#" target="_blank" rel="noopener">Google Calendar</a>
+        <a class="add-cal-btn" id="calApple" href="#" download="kingdom-standard-call.ics">Apple / iPhone</a>
+        <a class="add-cal-btn" id="calOutlook" href="#" target="_blank" rel="noopener">Outlook</a>
+      </div>
+    </div>
+    <p class="add-cal-fallback" id="calFallback">Your calendar invite is in your confirmation email from Calendly.</p>
+    <p class="step-label step-label--spaced">Step 2: Watch this video</p>
     <p class="confirmation-note">Watch the video below for clear next steps and what to expect on our call.</p>
   </div>
 </section>
@@ -57,8 +68,8 @@
 
 <section class="breakouts-section">
   <div class="lede">
-    <h2 class="lede-title">Before you start, take a look at this.</h2>
-    <p>The doubts most artists had before starting. Resolved in minutes.</p>
+    <p class="step-label">Step 3: Watch these before your call</p>
+    <h2 class="lede-title">The doubts most artists had before starting, resolved in minutes.</h2>
   </div>
   <div class="breakouts-grid">
     <div class="breakout">
@@ -102,5 +113,6 @@
   <p class="tagline">It's Jesus way or no way.</p>
   <p class="copyright">© 2026 Kingdom Standard. All rights reserved.</p>
 </footer>
+<script src="../add-to-calendar.js?v=20261109"></script>
 </body>
 </html>

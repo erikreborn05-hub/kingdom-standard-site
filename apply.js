@@ -43,6 +43,10 @@ window.addEventListener("message", (e) => {
 
   if (data.event === "calendly.event_scheduled") {
     logBooking();
-    window.location.href = window.location.origin + "/application-confirmation/";
+    // Calendly redirects to the confirmation page itself, with the booked time in
+    // the URL (for the "Add to calendar" buttons). Only step in if it doesn't.
+    setTimeout(() => {
+      window.location.href = window.location.origin + "/application-confirmation/";
+    }, 4000);
   }
 });
