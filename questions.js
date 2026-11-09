@@ -1,9 +1,11 @@
-// Five-question qualifier on /dominique/, hidden behind the "Click here to apply"
-// button. Answers go to Dominique's Google Sheet via an Apps Script webhook, both
-// as the visitor goes and when they leave. Producers and engineers always end on
-// the "application received" page; a plain "No" to the $200 question gets the
-// Kingdom Roots invite; Hip-Hop/R&B artists who answer "Yes" or "No, but I'm
-// planning to" book a call; anyone else ends on "application received".
+// Five-question application form shared by the homepage, /erikreborn/ and
+// /dominique/, hidden behind the "Click here to apply" button. Answers go to the
+// Google Sheet as the visitor goes and when they leave, tagged with the page.
+// Producers and engineers always end on the "application received" page; a
+// plain "No" to the $200 question gets the Kingdom Roots invite; Hip-Hop/R&B
+// artists who answer "Yes" or "No, but I'm planning to" go to the page's
+// booking calendar (the form's data-booking); anyone else ends on
+// "application received".
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwObKB-C8yU0U5D8gJUabpvmYD7lMUyuCDztsLGo6Ructv0_1Jwk4KM2P7-1Vz7mY46/exec";
@@ -22,6 +24,8 @@ const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 let selectedRoles = [];
 
 const form = document.getElementById("applyForm");
+// Which landing page this is, for the Source column in the sheet.
+const PAGE_SOURCE = location.pathname.split("/")[1] || "homepage";
 const steps = Array.from(form.querySelectorAll(".form-step"));
 const questionSteps = steps.filter((s) => s.dataset.step !== "end");
 const endStep = steps.find((s) => s.dataset.step === "end");
@@ -155,7 +159,7 @@ function sendAnswers(outcome) {
     mode: "no-cors",
     keepalive: true,
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, source: "dominique", outcome }, answers)),
+    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, source: PAGE_SOURCE, outcome }, answers)),
   }).catch(() => {});
 }
 
@@ -234,7 +238,7 @@ function goNext() {
     return;
   }
   sendAnswers("Booking page");
-  window.location.href = "apply/";
+  window.location.href = form.dataset.booking || "apply/";
 }
 
 function goBack() {
