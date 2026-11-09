@@ -25,6 +25,23 @@ function logBooking() {
   }).catch(() => {});
 }
 
+// Pre-fill Calendly with what they gave on the form: name, email, and their
+// Instagram handle as the answer to the event's first custom question (a1).
+// Runs before widget.js loads.
+(function () {
+  let contact = null;
+  try {
+    contact = JSON.parse(sessionStorage.getItem("ks_contact") || "null");
+  } catch (e) {}
+  const widget = document.querySelector(".calendly-inline-widget");
+  if (!contact || !widget) return;
+  const url = new URL(widget.dataset.url);
+  if (contact.name) url.searchParams.set("name", contact.name);
+  if (contact.email) url.searchParams.set("email", contact.email);
+  if (contact.instagram) url.searchParams.set("a1", contact.instagram);
+  widget.dataset.url = url.toString();
+})();
+
 window.addEventListener("message", (e) => {
   let data = e.data;
   if (typeof data === "string") {

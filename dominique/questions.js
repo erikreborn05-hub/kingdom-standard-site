@@ -138,7 +138,18 @@ function recordAnswers(step) {
 }
 
 // Fire-and-forget: a webhook hiccup should never block the visitor.
+// Lets the booking page pre-fill Calendly so they don't retype their details.
+function rememberContact() {
+  try {
+    sessionStorage.setItem(
+      "ks_contact",
+      JSON.stringify({ name: answers.fullName, email: answers.email, instagram: answers.instagram })
+    );
+  } catch (e) {}
+}
+
 function sendAnswers(outcome) {
+  rememberContact();
   fetch(SHEET_WEBHOOK_URL, {
     method: "POST",
     mode: "no-cors",
