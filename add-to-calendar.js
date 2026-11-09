@@ -25,8 +25,8 @@
   });
 
   document.getElementById("calGoogle").href =
-    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    `&text=${encodeURIComponent(title)}` +
+    "https://calendar.google.com/calendar/u/0/r/eventedit?" +
+    `text=${encodeURIComponent(title)}` +
     `&dates=${utc(start)}/${utc(end)}` +
     `&details=${encodeURIComponent(details)}`;
 
