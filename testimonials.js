@@ -1,3 +1,11 @@
+// Remember which landing page the visitor came through, so a later booking can
+// be credited to it in the sheet (homepage, erikreborn or dominique).
+(function () {
+  try {
+    sessionStorage.setItem("ks_source", location.pathname.split("/")[1] || "homepage");
+  } catch (e) {}
+})();
+
 // Click-to-expand lightbox for the testimonial screenshots. Builds its own
 // overlay markup on load, so nothing needs adding to the page HTML beyond
 // this script tag. No-ops on any page with no .testimonial-card images.

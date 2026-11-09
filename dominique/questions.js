@@ -6,7 +6,7 @@
 // planning to" book a call; anyone else ends on "application received".
 
 const SHEET_WEBHOOK_URL =
-  "https://script.google.com/macros/s/AKfycbw2u91V46TkZQ2507kpNiDOD3mi0XA-j2WN5ltwTAJtuBHXjij4bh-8Hswl7d1IuvmaRQ/exec";
+  "https://script.google.com/macros/s/AKfycbwObKB-C8yU0U5D8gJUabpvmYD7lMUyuCDztsLGo6Ructv0_1Jwk4KM2P7-1Vz7mY46/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 
 const TOTAL_QUESTIONS = 5;
@@ -43,9 +43,19 @@ startBtn.addEventListener("click", () => {
 const answers = {};
 // One ID per visit so the sheet updates a single row as answers come in,
 // instead of adding a new row for every step.
-const sessionId =
-  (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
-  `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+// Shared with the booking page (apply.js) so a booking updates this same row.
+let sessionId = null;
+try {
+  sessionId = sessionStorage.getItem("ks_session");
+} catch (e) {}
+if (!sessionId) {
+  sessionId =
+    (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try {
+    sessionStorage.setItem("ks_session", sessionId);
+  } catch (e) {}
+}
 let currentIndex = 0;
 let autoAdvanceTimer = null;
 let finished = false;
@@ -134,7 +144,7 @@ function sendAnswers(outcome) {
     mode: "no-cors",
     keepalive: true,
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, outcome }, answers)),
+    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, source: "dominique", outcome }, answers)),
   }).catch(() => {});
 }
 
