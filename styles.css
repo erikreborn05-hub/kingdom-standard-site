@@ -778,8 +778,9 @@ h1 .accent {
 }
 
 .phone-code {
-  flex: none;
-  width: 108px;
+  flex: 0 1 auto;
+  width: 200px;
+  min-width: 0;
   background: var(--card);
   border: none;
   border-bottom: 2px solid var(--border);

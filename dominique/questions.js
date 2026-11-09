@@ -292,4 +292,21 @@ window.addEventListener("pageshow", (e) => {
   if (e.persisted && steps[currentIndex] !== endStep) finished = false;
 });
 
+// Pre-select the phone country code from the visitor's browser region
+// (e.g. "en-GB" -> United Kingdom). Falls back to the United States.
+(function () {
+  const select = document.getElementById("phoneCode");
+  if (!select) return;
+  const langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+  for (const lang of langs) {
+    const region = (lang || "").split("-")[1];
+    if (!region) continue;
+    const option = select.querySelector(`option[data-cc="${region.toUpperCase()}"]`);
+    if (option) {
+      option.selected = true;
+      return;
+    }
+  }
+})();
+
 showStep(0);
