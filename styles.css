@@ -1130,9 +1130,9 @@ footer .copyright {
 .video-testimonials {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 28px;
   max-width: 980px;
-  margin: 0 auto 40px;
+  margin: 0 auto 72px;
   align-items: start;
 }
 .video-testimonial {
