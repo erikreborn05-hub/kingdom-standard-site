@@ -38,7 +38,13 @@ if (rootsLink) {
   rootsLink.hidden = false;
 }
 
+// When the form was opened, so the sheet script can drop applications
+// finished faster than a person could (bots).
+let openedAt = 0;
+const honeypot = document.getElementById("website");
+
 startBtn.addEventListener("click", () => {
+  if (!openedAt) openedAt = Date.now();
   buttonWrap.hidden = true;
   form.hidden = false;
   showStep(0);
@@ -159,7 +165,19 @@ function sendAnswers(outcome) {
     mode: "no-cors",
     keepalive: true,
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(Object.assign({ token: WEBHOOK_TOKEN, sessionId, source: PAGE_SOURCE, outcome }, answers)),
+    body: JSON.stringify(
+      Object.assign(
+        {
+          token: WEBHOOK_TOKEN,
+          sessionId,
+          source: PAGE_SOURCE,
+          outcome,
+          website: honeypot ? honeypot.value : "",
+          elapsedMs: openedAt ? Date.now() - openedAt : 0,
+        },
+        answers
+      )
+    ),
   }).catch(() => {});
 }
 

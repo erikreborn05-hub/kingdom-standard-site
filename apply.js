@@ -43,6 +43,8 @@ function logBooking() {
 })();
 
 window.addEventListener("message", (e) => {
+  // Only trust messages from the Calendly embed, not any other window.
+  if (e.origin !== "https://calendly.com") return;
   let data = e.data;
   if (typeof data === "string") {
     try {

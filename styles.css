@@ -1068,3 +1068,52 @@ footer .copyright {
     transition: none !important;
   }
 }
+
+/* Honeypot: hidden from people, filled in by naive bots. */
+.hp-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Privacy page and links */
+.privacy {
+  max-width: 680px;
+  padding-top: 64px;
+  padding-bottom: 96px;
+}
+.privacy h1 {
+  margin-bottom: 8px;
+}
+.privacy h2 {
+  margin: 36px 0 10px;
+  font-size: 1.2rem;
+}
+.privacy p,
+.privacy li {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.privacy ul {
+  padding-left: 1.2em;
+}
+.privacy a,
+.footer-links a,
+.form-privacy a {
+  color: var(--gold-bright);
+}
+.privacy-updated {
+  font-size: 0.9rem;
+}
+.footer-links {
+  margin: 8px 0;
+  font-size: 0.9rem;
+}
+.form-privacy {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
