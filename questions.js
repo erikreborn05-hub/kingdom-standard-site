@@ -17,7 +17,7 @@ const TOTAL_QUESTIONS = 5;
 const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
 // We don't work with producers or engineers: picking either always ends on the
 // "application received" page, even alongside an artist role.
-const EXCLUDED_ROLES = ["Producer / Beatmaker", "Mixing Engineer", "Other"];
+const EXCLUDED_ROLES = ["Beatmaker / Mixing Engineer", "Other"];
 const BOOKING_ANSWERS = ["Yes", "No, but I’m planning to"];
 // Plain "No" to the $200 question gets the free community invite instead.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
