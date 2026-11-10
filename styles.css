@@ -1158,3 +1158,15 @@ footer .copyright {
     max-width: 520px;
   }
 }
+
+/* "Watch the video below..." styled like the section headlines */
+.confirmation-hero .confirmation-note--title {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 3.8vw, 2.2rem);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  max-width: 640px;
+  text-wrap: balance;
+}
