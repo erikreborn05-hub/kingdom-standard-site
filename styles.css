@@ -237,7 +237,7 @@ h1 .accent {
 }
 
 .confirmation-hero--tight {
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .confirmation-hero .step-label + .confirmation-note {
@@ -1169,4 +1169,12 @@ footer .copyright {
   color: var(--text);
   max-width: 640px;
   text-wrap: balance;
+}
+
+/* Step 2 label sits right on top of the video now */
+.confirmation-hero--tight .step-label--spaced:last-child {
+  margin-bottom: 0;
+}
+.confirmation-hero--tight + .video-section {
+  padding-top: 0;
 }
