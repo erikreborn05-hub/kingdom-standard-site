@@ -337,9 +337,27 @@ window.addEventListener("pageshow", (e) => {
     const option = select.querySelector(`option[data-cc="${region.toUpperCase()}"]`);
     if (option) {
       option.selected = true;
-      return;
+      break;
     }
   }
+
+  // Show just the code ("+44") in the box; the full country list still
+  // appears when it's tapped. The real select sits invisibly on top.
+  const wrap = document.createElement("div");
+  wrap.className = "phone-code-wrap";
+  const shown = document.createElement("span");
+  shown.className = "phone-code-shown";
+  shown.setAttribute("aria-hidden", "true");
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(shown);
+  wrap.appendChild(select);
+  const update = () => {
+    shown.textContent = select.value;
+  };
+  select.addEventListener("change", update);
+  select.addEventListener("focus", () => wrap.classList.add("focused"));
+  select.addEventListener("blur", () => wrap.classList.remove("focused"));
+  update();
 })();
 
 showStep(0);

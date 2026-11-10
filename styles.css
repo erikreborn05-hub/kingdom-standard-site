@@ -1020,12 +1020,12 @@ h1 .accent {
 
 @media (max-width: 600px) {
   .apply-section {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .form-card {
-    padding: 4px;
+    padding: 24px 20px;
     border-radius: 16px;
   }
 }
@@ -1177,4 +1177,39 @@ footer .copyright {
 }
 .confirmation-hero--tight + .video-section {
   padding-top: 14px;
+}
+
+/* Country code: shows only "+44"; the invisible select on top opens the full list */
+.phone-code-wrap {
+  position: relative;
+  flex: none;
+  width: 84px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 2px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+  font-size: 1.15rem;
+  transition: border-color 0.2s ease;
+}
+.phone-code-wrap::after {
+  content: "";
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: translateY(-3px) rotate(45deg);
+}
+.phone-code-wrap.focused {
+  border-color: var(--gold);
+}
+.phone-code-wrap .phone-code {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
 }
