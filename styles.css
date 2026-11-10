@@ -715,6 +715,7 @@ h1 .accent {
   letter-spacing: -0.015em;
   line-height: 1.35;
   color: var(--text);
+  text-align: center;
 }
 
 .breakout-summary {
@@ -1099,21 +1100,61 @@ footer .copyright {
 .privacy ul {
   padding-left: 1.2em;
 }
-.privacy a,
+.privacy a {
+  color: var(--gold-bright);
+}
 .footer-links a,
 .form-privacy a {
-  color: var(--gold-bright);
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .privacy-updated {
   font-size: 0.9rem;
 }
 .footer-links {
   margin: 8px 0;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 .form-privacy {
   margin: 20px 0 0;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Video testimonials: two 16:9 videos side by side, stacked on phones. */
+.video-testimonials {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 980px;
+  margin: 0 auto 40px;
+  align-items: start;
+}
+.video-testimonial {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--border);
+}
+.video-testimonial wistia-player {
+  display: block;
+  width: 100%;
+}
+.testimonials-videos-section .lede {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.testimonials-videos-section {
+  padding-top: 0;
+}
+@media (max-width: 700px) {
+  .video-testimonials {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
 }
