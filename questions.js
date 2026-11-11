@@ -1,25 +1,23 @@
 // Five-question application form shared by the homepage, /erikreborn/ and
 // /dominique/, hidden behind the "Click here to apply" button. Answers go to the
 // Google Sheet as the visitor goes and when they leave, tagged with the page.
-// Producers and engineers always end on the "application received" page; a
-// plain "No" to the $200 question gets the Kingdom Roots invite; Hip-Hop/R&B
-// artists who answer "Yes" or "No, but I'm planning to" go to the page's
-// booking calendar (the form's data-booking); anyone else ends on
-// "application received".
+// Beatmakers/engineers and "Other" always end on the "application received"
+// page; Hip-Hop/R&B artists go to the page's booking calendar (the form's
+// data-booking); anyone else ends on "application received". The monthly
+// salary question (stored as investReady) is recorded only, never used to filter.
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwObKB-C8yU0U5D8gJUabpvmYD7lMUyuCDztsLGo6Ructv0_1Jwk4KM2P7-1Vz7mY46/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 
 const TOTAL_QUESTIONS = 5;
-// "Yes" books a call only if at least one of these roles is selected; anyone
+// A call can be booked only if at least one of these roles is selected; anyone
 // else is reviewed by hand.
 const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
 // We don't work with producers or engineers: picking either always ends on the
 // "application received" page, even alongside an artist role.
 const EXCLUDED_ROLES = ["Beatmaker / Mixing Engineer", "Other"];
-const BOOKING_ANSWERS = ["Yes", "No, but I’m planning to"];
-// Plain "No" to the $200 question gets the free community invite instead.
+// Free community link on the (currently unused) Kingdom Roots end screen.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 let selectedRoles = [];
 
@@ -240,16 +238,7 @@ function goNext() {
 
   finished = true;
   const excluded = selectedRoles.some((r) => EXCLUDED_ROLES.includes(r));
-  // Kingdom Roots is for Christian artists only, so producers/engineers never get it.
-  if (answers.investReady === "No" && !excluded) {
-    sendAnswers("Kingdom Roots");
-    showStep(steps.indexOf(endStep));
-    return;
-  }
-  const canBook =
-    !excluded &&
-    selectedRoles.some((r) => BOOKING_ROLES.includes(r)) &&
-    BOOKING_ANSWERS.includes(answers.investReady);
+  const canBook = !excluded && selectedRoles.some((r) => BOOKING_ROLES.includes(r));
   if (!canBook) {
     sendAnswers("Under review");
     window.location.href = "/application-received/";
