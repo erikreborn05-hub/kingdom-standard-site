@@ -39,7 +39,9 @@ function logBooking() {
   if (contact.name) url.searchParams.set("name", contact.name);
   if (contact.email) url.searchParams.set("email", contact.email);
   if (contact.instagram) url.searchParams.set("a1", contact.instagram);
-  widget.dataset.url = url.toString();
+  // URLSearchParams writes spaces as "+", which Calendly shows literally
+  // ("John+Smith"). Real plus signs are already encoded as %2B, so this is safe.
+  widget.dataset.url = url.toString().replace(/\+/g, "%20");
 })();
 
 window.addEventListener("message", (e) => {
