@@ -4,7 +4,8 @@
 // Beatmakers/engineers and "Other" always end on the "application received"
 // page; Hip-Hop/R&B artists go to the page's booking calendar (the form's
 // data-booking); anyone else ends on "application received". The monthly
-// salary question (stored as investReady) is recorded only, never used to filter.
+// salary question (stored as investReady) only matters for REVIEW_COUNTRIES:
+// the lowest band from those countries goes to "application received".
 
 const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwObKB-C8yU0U5D8gJUabpvmYD7lMUyuCDztsLGo6Ructv0_1Jwk4KM2P7-1Vz7mY46/exec";
@@ -17,6 +18,29 @@ const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
 // We don't work with producers or engineers: picking either always ends on the
 // "application received" page, even alongside an artist role.
 const EXCLUDED_ROLES = ["Beatmaker / Mixing Engineer", "Other"];
+// Visitors from these countries who pick the lowest salary band are sent to
+// "application received" instead of booking. Country comes from the server
+// (/cc, based on their connection); if it can't be found, nobody is held back.
+const REVIEW_COUNTRIES = [
+  // Africa
+  "DZ", "AO", "BJ", "BW", "BF", "BI", "CV", "CM", "CF", "TD", "KM", "CG", "CD", "CI", "DJ",
+  "EG", "GQ", "ER", "SZ", "ET", "GA", "GM", "GH", "GN", "GW", "KE", "LS", "LR", "LY", "MG",
+  "MW", "ML", "MR", "MU", "MA", "MZ", "NA", "NE", "NG", "RW", "ST", "SN", "SC", "SL", "SO",
+  "ZA", "SS", "SD", "TZ", "TG", "TN", "UG", "ZM", "ZW",
+  // South Asia
+  "IN", "PK", "BD", "NP", "LK",
+  // Southeast Asia
+  "PH", "ID",
+];
+const LOWEST_SALARY = "Under $1,250";
+let visitorCountry = "";
+fetch("/cc", { cache: "no-store" })
+  .then((r) => (r.ok ? r.text() : ""))
+  .then((t) => {
+    if (/^[A-Z]{2}$/.test(t.trim())) visitorCountry = t.trim();
+  })
+  .catch(() => {});
+
 // Free community link on the (currently unused) Kingdom Roots end screen.
 const KINGDOM_ROOTS_URL = "https://discord.gg/XHJ7BEAsdy";
 let selectedRoles = [];
@@ -238,7 +262,10 @@ function goNext() {
 
   finished = true;
   const excluded = selectedRoles.some((r) => EXCLUDED_ROLES.includes(r));
-  const canBook = !excluded && selectedRoles.some((r) => BOOKING_ROLES.includes(r));
+  const lowIncomeRegion =
+    answers.investReady === LOWEST_SALARY && REVIEW_COUNTRIES.includes(visitorCountry);
+  const canBook =
+    !excluded && !lowIncomeRegion && selectedRoles.some((r) => BOOKING_ROLES.includes(r));
   if (!canBook) {
     sendAnswers("Under review");
     window.location.href = "/application-received/";
