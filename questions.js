@@ -1,4 +1,4 @@
-// Five-question application form shared by the homepage, /erikreborn/ and
+// Application form (five questions plus a final agreement step) shared by the homepage, /erikreborn/ and
 // /dominique/, hidden behind the "Click here to apply" button. Answers go to the
 // Google Sheet as the visitor goes and when they leave, tagged with the page.
 // Beatmakers/engineers and "Other" always end on the "application received"
@@ -11,7 +11,7 @@ const SHEET_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwObKB-C8yU0U5D8gJUabpvmYD7lMUyuCDztsLGo6Ructv0_1Jwk4KM2P7-1Vz7mY46/exec";
 const WEBHOOK_TOKEN = "4b1452bd158dbf136adadf654d4a708265a8e7d47292473d";
 
-const TOTAL_QUESTIONS = 5;
+const TOTAL_QUESTIONS = 6;
 // A call can be booked only if at least one of these roles is selected; anyone
 // else is reviewed by hand.
 const BOOKING_ROLES = ["Christian Hip-Hop Artist", "Christian R&B Artist"];
